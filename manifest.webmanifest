@@ -1,0 +1,19 @@
+{
+  "name": "Sinhala Clock",
+  "short_name": "Sinhala Clock",
+  "description": "A quiet everyday clock for learning Sinhala through time, dates and weekdays.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#29483d",
+  "theme_color": "#315f43",
+  "orientation": "portrait",
+  "lang": "si",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

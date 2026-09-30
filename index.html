@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<title>සිංහල Clock — Sinhala Daily Clock</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body {
+    font-family: "Noto Sans Sinhala", "Noto Sans", system-ui, sans-serif;
+    overflow: hidden;
+    color: #fff;
+    background: #29483d;
+  }
+
+  .scene {
+    min-height: 100vh;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 1.8s ease;
+    background:
+      linear-gradient(to bottom, rgba(80,125,112,.25), rgba(25,55,43,.48)),
+      linear-gradient(145deg, #9fb9ae 0%, #628879 42%, #304f42 100%);
+  }
+
+  /* soft sky light */
+  .scene::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 72% 24%, rgba(255,244,190,.32), transparent 19%),
+      linear-gradient(to bottom, transparent 48%, rgba(18,44,34,.32) 100%);
+    pointer-events: none;
+  }
+
+  .mist {
+    position: absolute;
+    left: -10%;
+    width: 120%;
+    height: 18vh;
+    border-radius: 50%;
+    background: rgba(244,247,239,.15);
+    filter: blur(22px);
+    bottom: 29%;
+    transform: rotate(-4deg);
+    animation: drift 12s ease-in-out infinite alternate;
+  }
+  .mist.two {
+    bottom: 42%;
+    opacity: .6;
+    animation-duration: 17s;
+    transform: rotate(3deg);
+  }
+
+  @keyframes drift {
+    from { transform: translateX(-3%) rotate(-4deg); }
+    to   { transform: translateX(4%) rotate(-2deg); }
+  }
+
+  /* distant tea hills */
+  .hill {
+    position: absolute;
+    left: -8%;
+    width: 116%;
+    border-radius: 50% 50% 0 0;
+    transform: rotate(-2deg);
+    opacity: .82;
+  }
+  .hill.back {
+    height: 28vh;
+    bottom: -7vh;
+    background:
+      repeating-linear-gradient(165deg,
+        rgba(24,67,49,.45) 0 9px,
+        rgba(73,112,78,.38) 10px 17px);
+  }
+  .hill.front {
+    height: 24vh;
+    bottom: -10vh;
+    background:
+      repeating-linear-gradient(164deg,
+        #315f43 0 8px,
+        #477551 9px 15px,
+        #2d5a40 16px 23px);
+  }
+
+  .tea-rows {
+    position: absolute;
+    z-index: 2;
+    left: -12%;
+    bottom: 0;
+    width: 124%;
+    height: 31vh;
+    opacity: .62;
+    transform: perspective(360px) rotateX(23deg) rotateZ(-3deg);
+    transform-origin: bottom center;
+    background: repeating-linear-gradient(
+      166deg, transparent 0 13px,
+      rgba(18,55,37,.42) 14px 17px,
+      transparent 18px 29px);
+  }
+
+  .tea-bushes {
+    position: absolute;
+    z-index: 3;
+    left: 0; right: 0; bottom: 7vh; height: 10vh;
+    opacity: .72;
+    background:
+      radial-gradient(ellipse at 4% 85%, #315d40 0 22px, transparent 23px),
+      radial-gradient(ellipse at 11% 70%, #416f4c 0 28px, transparent 29px),
+      radial-gradient(ellipse at 19% 88%, #315d40 0 25px, transparent 26px),
+      radial-gradient(ellipse at 28% 67%, #4b7953 0 31px, transparent 32px),
+      radial-gradient(ellipse at 38% 84%, #315d40 0 27px, transparent 28px),
+      radial-gradient(ellipse at 49% 70%, #416f4c 0 30px, transparent 31px),
+      radial-gradient(ellipse at 60% 87%, #315d40 0 25px, transparent 26px),
+      radial-gradient(ellipse at 71% 69%, #4b7953 0 32px, transparent 33px),
+      radial-gradient(ellipse at 82% 86%, #315d40 0 26px, transparent 27px),
+      radial-gradient(ellipse at 93% 70%, #416f4c 0 30px, transparent 31px);
+  }
+
+  .content {
+    position: relative;
+    z-index: 5;
+    width: min(92vw, 700px);
+    text-align: center;
+    padding: 32px 18px 100px;
+    text-shadow: 0 2px 18px rgba(0,0,0,.18);
+  }
+
+  .small-label {
+    font-size: 13px;
+    letter-spacing: .16em;
+    opacity: .78;
+    margin-bottom: 18px;
+  }
+
+  #sinhalaTime {
+    font-size: clamp(2.35rem, 8vw, 5.5rem);
+    line-height: 1.22;
+    font-weight: 500;
+    letter-spacing: .02em;
+    margin: 0 auto;
+  }
+
+  #alternative {
+    min-height: 27px;
+    margin-top: 12px;
+    font-size: clamp(.92rem, 2.8vw, 1.2rem);
+    opacity: .82;
+  }
+
+  #digital {
+    margin-top: 19px;
+    font-family: system-ui, sans-serif;
+    font-size: 15px;
+    letter-spacing: .18em;
+    opacity: .72;
+  }
+
+  .date {
+    margin-top: 35px;
+    font-size: clamp(1rem, 3.4vw, 1.35rem);
+    letter-spacing: .08em;
+    opacity: .92;
+    cursor: pointer;
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+  }
+
+  .weekday {
+    margin-top: 5px;
+    font-size: .94rem;
+    opacity: .72;
+    cursor: pointer;
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+  }
+
+  .word { cursor: pointer; border-radius: 8px; }
+  .word:hover, .word:active, .date:hover, .weekday:hover {
+    background: rgba(255,255,255,.11);
+  }
+
+  .meaning {
+    position: fixed;
+    z-index: 20;
+    left: 50%; bottom: 46px;
+    transform: translateX(-50%) translateY(8px);
+    width: min(86vw, 340px);
+    padding: 14px 18px;
+    border: 1px solid rgba(255,255,255,.18);
+    border-radius: 18px;
+    background: rgba(22,47,39,.80);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .25s, transform .25s;
+    text-align: center;
+  }
+  .meaning.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  .meaning .si { font-size: 1.25rem; margin-bottom: 3px; }
+  .meaning .ja {
+    font-family: system-ui, sans-serif;
+    font-size: .82rem;
+    opacity: .78;
+  }
+
+  .leaf {
+    position: absolute;
+    z-index: 4;
+    font-size: 22px;
+    opacity: .55;
+    transform: rotate(-18deg);
+  }
+  .leaf.a { left: 7%; top: 13%; }
+  .leaf.b { right: 8%; top: 19%; transform: rotate(25deg); }
+  .leaf.c { left: 12%; bottom: 18%; transform: rotate(50deg); }
+
+  .footer {
+    position: absolute;
+    z-index: 6;
+    bottom: 17px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-family: system-ui, sans-serif;
+    font-size: 10px;
+    letter-spacing: .18em;
+    opacity: .42;
+  }
+
+  /* time-of-day moods */
+  body.morning .scene {
+    background:
+      linear-gradient(to bottom, rgba(136,169,155,.28), rgba(42,77,61,.48)),
+      linear-gradient(145deg, #c4d1c6 0%, #7eaa91 43%, #385d49 100%);
+  }
+  body.day .scene {
+    background:
+      linear-gradient(to bottom, rgba(115,153,125,.10), rgba(26,65,44,.40)),
+      linear-gradient(145deg, #a8c7aa 0%, #63966d 45%, #315f43 100%);
+  }
+  body.evening .scene {
+    background:
+      linear-gradient(to bottom, rgba(209,165,117,.18), rgba(52,61,44,.52)),
+      linear-gradient(145deg, #d7b997 0%, #9b9870 43%, #405642 100%);
+  }
+  body.night .scene {
+    background:
+      radial-gradient(circle at 74% 22%, rgba(210,226,215,.18), transparent 9%),
+      linear-gradient(145deg, #24394a 0%, #274b48 48%, #172e29 100%);
+  }
+  body.night .mist { opacity: .25; }
+  body.night .hill.front { background:
+      repeating-linear-gradient(164deg,
+        #183b35 0 8px,
+        #285045 9px 15px,
+        #16352f 16px 23px); }
+</style>
+<meta name="theme-color" content="#315f43">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Sinhala Clock">
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+html { background:#29483d; }
+body { min-height:100dvh; }
+.scene { min-height:100dvh; padding-top:env(safe-area-inset-top); padding-bottom:env(safe-area-inset-bottom); }
+.content { padding-top:max(32px,env(safe-area-inset-top)); padding-bottom:max(100px,env(safe-area-inset-bottom)); }
+</style>
+</head>
+
+<body>
+<div class="scene">
+  <div class="mist"></div>
+  <div class="mist two"></div>
+  <div class="hill back"></div>
+  <div class="hill front"></div>
+  <div class="tea-rows"></div>
+  <div class="tea-bushes"></div>
+
+  <div class="leaf a">🍃</div>
+  <div class="leaf b">🍃</div>
+  <div class="leaf c">🍃</div>
+
+  <main class="content">
+    <div class="small-label">සිංහල · EVERYDAY CLOCK</div>
+    <h1 id="sinhalaTime">අටයි කාලයි</h1>
+    <div id="alternative">(අටයි පහළොවයි)</div>
+    <div id="digital">08:15</div>
+
+    <div class="date" id="date">සැප්තැම්බර් 30</div>
+    <div class="weekday" id="weekday">බදාදා</div>
+  </main>
+
+  <div class="footer">a little sinhala, woven into everyday life</div>
+  <div class="meaning" id="meaning">
+    <div class="si" id="meaningSi"></div>
+    <div class="ja" id="meaningJa"></div>
+  </div>
+</div>
+
+<script>
+const nums = [
+  "", "එක", "දෙක", "තුන", "හතර", "පහ", "හය", "හත", "අට", "නවය",
+  "දහය", "එකොළහ", "දොළහ", "දහතුන", "දාහතර", "පහළොව", "දහසය",
+  "දාහත", "දහඅට", "දහනවය", "විස්ස"
+];
+
+function sinhalaNumber(n) {
+  if (n <= 20) return nums[n];
+
+  const tens = Math.floor(n / 10);
+  const ones = n % 10;
+
+  const tensWord = {
+    2: "විසි", 3: "තිස්", 4: "හතළිස්",
+    5: "පනස්"
+  }[tens];
+
+  return ones === 0 ? {
+    2: "විස්ස", 3: "තිහ", 4: "හතළිහ", 5: "පනහ"
+  }[tens] : tensWord + nums[ones];
+}
+
+const months = [
+  "ජනවාරි", "පෙබරවාරි", "මාර්තු", "අප්‍රේල්", "මැයි", "ජූනි",
+  "ජූලි", "අගෝස්තු", "සැප්තැම්බර්", "ඔක්තෝබර්", "නොවැම්බර්", "දෙසැම්බර්"
+];
+
+const weekdays = [
+  "ඉරිදා", "සඳුදා", "අඟහරුවාදා", "බදාදා",
+  "බ්‍රහස්පතින්දා", "සිකුරාදා", "සෙනසුරාදා"
+];
+
+function hourWord(h24) {
+  const h = h24 % 12 || 12;
+  return sinhalaNumber(h);
+}
+
+function clickable(text, meaning) {
+  return `<span class="word" data-si="${text}" data-ja="${meaning}">${text}</span>`;
+}
+
+function timeInSinhala(date) {
+  const h24 = date.getHours();
+  const m = date.getMinutes();
+  const h = hourWord(h24);
+
+  if (m === 0) {
+    return { mainHtml: clickable(h, "時") + "යි", altHtml: "" };
+  }
+  if (m === 15) {
+    return {
+      mainHtml: clickable(h, "時") + "යි " + clickable("කාලයි", "15分"),
+      altHtml: "(" + clickable(h, "時") + "යි " + clickable(sinhalaNumber(m), "15") + "යි)"
+    };
+  }
+  if (m === 30) {
+    return {
+      mainHtml: clickable(h, "時") + " " + clickable("හමාරයි", "30分／半"),
+      altHtml: "(" + clickable(h, "時") + "යි " + clickable(sinhalaNumber(m), "30") + "යි)"
+    };
+  }
+  return {
+    mainHtml: clickable(h, "時") + "යි " + clickable(sinhalaNumber(m), "分"),
+    altHtml: ""
+  };
+}
+
+function showMeaning(si, ja) {
+  const box = document.getElementById("meaning");
+  document.getElementById("meaningSi").textContent = si;
+  document.getElementById("meaningJa").textContent = ja;
+  box.classList.add("show");
+  clearTimeout(window.meaningTimer);
+  window.meaningTimer = setTimeout(() => box.classList.remove("show"), 2400);
+}
+
+document.addEventListener("click", (event) => {
+  const word = event.target.closest(".word");
+  if (word) {
+    showMeaning(word.dataset.si, word.dataset.ja);
+    return;
+  }
+  if (event.target.closest("#date")) {
+    showMeaning(document.getElementById("date").textContent, "シンハラ語の日付");
+  } else if (event.target.closest("#weekday")) {
+    showMeaning(document.getElementById("weekday").textContent, "シンハラ語の曜日");
+  }
+});
+
+function update() {
+  const now = new Date();
+  const t = timeInSinhala(now);
+
+  document.getElementById("sinhalaTime").innerHTML = t.mainHtml;
+  document.getElementById("alternative").innerHTML = t.altHtml;
+
+  const hh = String(now.getHours()).padStart(2, "0");
+  const mm = String(now.getMinutes()).padStart(2, "0");
+  document.getElementById("digital").textContent = hh + ":" + mm;
+
+  document.getElementById("date").textContent =
+    months[now.getMonth()] + " " + sinhalaNumber(now.getDate());
+
+  document.getElementById("weekday").textContent =
+    weekdays[now.getDay()];
+
+  const hour = now.getHours();
+  document.body.className =
+    hour >= 5 && hour < 11 ? "morning" :
+    hour >= 11 && hour < 17 ? "day" :
+    hour >= 17 && hour < 21 ? "evening" : "night";
+}
+
+update();
+setInterval(update, 1000);
+</script>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {}));
+}
+</script>
+</body>
+</html>
