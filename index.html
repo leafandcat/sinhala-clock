@@ -20,20 +20,44 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background 1.8s ease;
-    background:
-      linear-gradient(to bottom, rgba(80,125,112,.25), rgba(25,55,43,.48)),
-      linear-gradient(145deg, #9fb9ae 0%, #628879 42%, #304f42 100%);
+    overflow: hidden;
+    background: #29483d;
   }
 
-  /* soft sky light */
+  .photo-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background-position: center center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    transform: scale(1.015);
+    transition: background-image 1.8s ease, opacity 1.2s ease, transform 12s ease;
+  }
+
+  .photo-bg::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(20,43,35,.18) 0%, rgba(20,43,35,.18) 42%, rgba(13,34,28,.55) 100%);
+  }
+
+  .photo-wash {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: rgba(22,55,43,.08);
+    pointer-events: none;
+    transition: background 1.5s ease;
+  }
+
+  /* soft light over the photo */
   .scene::before {
     content: "";
     position: absolute;
     inset: 0;
-    background:
-      radial-gradient(circle at 72% 24%, rgba(255,244,190,.32), transparent 19%),
-      linear-gradient(to bottom, transparent 48%, rgba(18,44,34,.32) 100%);
+    z-index: 2;
+    background: radial-gradient(circle at 72% 20%, rgba(255,244,190,.20), transparent 24%);
     pointer-events: none;
   }
 
@@ -68,7 +92,8 @@
     width: 116%;
     border-radius: 50% 50% 0 0;
     transform: rotate(-2deg);
-    opacity: .82;
+    opacity: .14;
+    z-index: 3;
   }
   .hill.back {
     height: 28vh;
@@ -127,19 +152,19 @@
     z-index: 5;
     width: min(92vw, 700px);
     text-align: center;
-    padding: 32px 18px 100px;
+    padding: 34px 18px 105px;
     text-shadow: 0 2px 18px rgba(0,0,0,.18);
   }
 
   .small-label {
-    font-size: 13px;
+    font-size: 14px;
     letter-spacing: .16em;
     opacity: .78;
     margin-bottom: 18px;
   }
 
   #sinhalaTime {
-    font-size: clamp(2.35rem, 8vw, 5.5rem);
+    font-size: clamp(3.15rem, 11vw, 7rem);
     line-height: 1.22;
     font-weight: 500;
     letter-spacing: .02em;
@@ -149,21 +174,21 @@
   #alternative {
     min-height: 27px;
     margin-top: 12px;
-    font-size: clamp(.92rem, 2.8vw, 1.2rem);
+    font-size: clamp(1.08rem, 3.5vw, 1.42rem);
     opacity: .82;
   }
 
   #digital {
     margin-top: 19px;
     font-family: system-ui, sans-serif;
-    font-size: 15px;
+    font-size: 18px;
     letter-spacing: .18em;
     opacity: .72;
   }
 
   .date {
     margin-top: 35px;
-    font-size: clamp(1rem, 3.4vw, 1.35rem);
+    font-size: clamp(1.18rem, 4vw, 1.55rem);
     letter-spacing: .08em;
     opacity: .92;
     cursor: pointer;
@@ -174,7 +199,7 @@
 
   .weekday {
     margin-top: 5px;
-    font-size: .94rem;
+    font-size: 1.08rem;
     opacity: .72;
     cursor: pointer;
     display: inline-block;
@@ -240,26 +265,10 @@
   }
 
   /* time-of-day moods */
-  body.morning .scene {
-    background:
-      linear-gradient(to bottom, rgba(136,169,155,.28), rgba(42,77,61,.48)),
-      linear-gradient(145deg, #c4d1c6 0%, #7eaa91 43%, #385d49 100%);
-  }
-  body.day .scene {
-    background:
-      linear-gradient(to bottom, rgba(115,153,125,.10), rgba(26,65,44,.40)),
-      linear-gradient(145deg, #a8c7aa 0%, #63966d 45%, #315f43 100%);
-  }
-  body.evening .scene {
-    background:
-      linear-gradient(to bottom, rgba(209,165,117,.18), rgba(52,61,44,.52)),
-      linear-gradient(145deg, #d7b997 0%, #9b9870 43%, #405642 100%);
-  }
-  body.night .scene {
-    background:
-      radial-gradient(circle at 74% 22%, rgba(210,226,215,.18), transparent 9%),
-      linear-gradient(145deg, #24394a 0%, #274b48 48%, #172e29 100%);
-  }
+  body.morning .photo-bg::after { background: linear-gradient(to bottom, rgba(255,248,228,.05), rgba(18,48,37,.48)); }
+  body.day .photo-bg::after { background: linear-gradient(to bottom, rgba(255,255,255,.02), rgba(12,48,31,.42)); }
+  body.evening .photo-bg::after { background: linear-gradient(to bottom, rgba(116,79,49,.10), rgba(28,42,34,.55)); }
+  body.night .photo-bg::after { background: linear-gradient(to bottom, rgba(10,28,36,.20), rgba(8,22,26,.72)); }
   body.night .mist { opacity: .25; }
   body.night .hill.front { background:
       repeating-linear-gradient(164deg,
@@ -282,6 +291,8 @@ body { min-height:100dvh; }
 
 <body>
 <div class="scene">
+  <div class="photo-bg" id="photoBg"></div>
+  <div class="photo-wash" id="photoWash"></div>
   <div class="mist"></div>
   <div class="mist two"></div>
   <div class="hill back"></div>
@@ -400,6 +411,29 @@ document.addEventListener("click", (event) => {
   }
 });
 
+const photoScenes = [
+  { start: 5, end: 10, image: "morning-flower.jpeg", position: "center center", wash: "rgba(255,244,218,.06)" },
+  { start: 10, end: 13, image: "tea-hills.jpeg", position: "center center", wash: "rgba(34,82,57,.02)" },
+  { start: 13, end: 15, image: "tea-tasting.jpeg", position: "center 55%", wash: "rgba(75,45,28,.06)" },
+  { start: 15, end: 17, image: "afternoon-tea.jpeg", position: "center center", wash: "rgba(34,72,52,.02)" },
+  { start: 17, end: 20, image: "train-green.jpeg", position: "center center", wash: "rgba(20,54,43,.06)" },
+  { start: 20, end: 24, image: "tea-field-blue.jpeg", position: "center 48%", wash: "rgba(14,31,42,.18)" },
+  { start: 0, end: 5, image: "tea-field-blue.jpeg", position: "center 48%", wash: "rgba(12,27,35,.28)" }
+];
+
+let currentPhoto = "";
+function updatePhoto(hour) {
+  const scene = photoScenes.find(p => hour >= p.start && hour < p.end) || photoScenes[0];
+  const bg = document.getElementById("photoBg");
+  const wash = document.getElementById("photoWash");
+  if (scene.image !== currentPhoto) {
+    bg.style.backgroundImage = `url("${scene.image}")`;
+    bg.style.backgroundPosition = scene.position;
+    currentPhoto = scene.image;
+  }
+  wash.style.background = scene.wash;
+}
+
 function update() {
   const now = new Date();
   const t = timeInSinhala(now);
@@ -418,6 +452,7 @@ function update() {
     weekdays[now.getDay()];
 
   const hour = now.getHours();
+  updatePhoto(hour);
   document.body.className =
     hour >= 5 && hour < 11 ? "morning" :
     hour >= 11 && hour < 17 ? "day" :
