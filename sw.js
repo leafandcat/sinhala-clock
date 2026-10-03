@@ -1,4 +1,4 @@
-const CACHE_NAME = "sinhala-clock-v2";
+const CACHE_NAME = "sinhala-clock-v3";
 const ASSETS = [
   "./", "./index.html", "./manifest.webmanifest", "./icon.svg",
   "./morning-flower.jpeg", "./tea-hills.jpeg", "./train-green.jpeg",
